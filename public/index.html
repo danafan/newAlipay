@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>支付宝管理系统</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="text/javascript">
+    (function () {
+      document.addEventListener('DOMContentLoaded', function () {
+        autoWidth();
+      });
+      //监听屏幕大小改变
+      window.onresize = function(){
+        autoWidth();
+      };
+      //修改适配
+      function autoWidth(){
+        var html = document.documentElement;
+        var windowWidth = parseInt(html.clientWidth);       //html宽度
+        html.style.fontSize = windowWidth / 110 + 'px';
+      } 
+    })();
+  </script>
+  </body>
+</html>
