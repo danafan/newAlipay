@@ -218,6 +218,8 @@
 			//点击某一条的查看明细
 			lookDetail(val){
 				console.log(val);
+				sessionStorage.setItem("tab",'/content');
+				this.$router.push('/content');
 			},
 			handleSizeChange(val) {
 				console.log(`每页 ${val} 条`);

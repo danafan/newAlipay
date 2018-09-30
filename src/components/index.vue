@@ -158,7 +158,7 @@
 				}else if(tab == '/control'){
 					this.selTab = 1;
 					this.aliTab = 0;
-				}else if(tab == '/detailed'){
+				}else if(tab == '/detailed' || tab == '/content'){
 					this.selTab = 1;
 					this.aliTab = 1;
 				}
@@ -180,7 +180,8 @@
 					if(this.aliTab == 0){
 						this.$router.push('/control');
 					}else{
-						this.$router.push('/detailed');
+						let tab = sessionStorage.getItem("tab");
+						this.$router.push(tab);
 					}
 				}
 			},

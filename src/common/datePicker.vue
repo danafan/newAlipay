@@ -93,6 +93,7 @@
 		}
 	}
 	.block{
+		width: 35rem;
 		display:flex;
 		align-items: center;
 		.demonstration{

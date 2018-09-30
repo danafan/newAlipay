@@ -38,7 +38,7 @@
 				</el-table-column>
 				<el-table-column align="center" label="授权" style="width: 10%">
 					<template slot-scope="scope">
-						<div class="shou">授权</div>
+						<div class="shou" v-if="scope.row.status == true">授权</div>
 					</template>
 				</el-table-column>
 				<el-table-column label="操作" style="width: 10%">

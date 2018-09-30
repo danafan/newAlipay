@@ -6,6 +6,7 @@ const index = resolve=>System.import('@/components/index')
 const home = resolve=>System.import('@/components/home')
 const control = resolve=>System.import('@/components/control')
 const detailed = resolve=>System.import('@/components/detailed')
+const content = resolve=>System.import('@/components/content')
 
 
 Vue.use(Router)
@@ -22,7 +23,8 @@ export default new Router({
     children:[
     { path: '/home', component: home},
     { path: '/control', component: control},
-    { path: '/detailed', component: detailed}
+    { path: '/detailed', component: detailed},
+    { path: '/content', component: content}
     ]
   }
   ]
