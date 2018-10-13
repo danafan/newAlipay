@@ -1,17 +1,17 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-const login = resolve=>System.import('@/components/login')
-const index = resolve=>System.import('@/components/index')
-const home = resolve=>System.import('@/components/home')
-const control = resolve=>System.import('@/components/control')
-const detailed = resolve=>System.import('@/components/detailed')
-const content = resolve=>System.import('@/components/content')
+const login = resolve=>require(['@/components/login'],resolve)
+const index = resolve=>require(['@/components/index'],resolve)
+const home = resolve=>require(['@/components/home'],resolve)
+const control = resolve=>require(['@/components/control'],resolve)
+const detailed = resolve=>require(['@/components/detailed'],resolve)
+const content = resolve=>require(['@/components/content'],resolve)
 
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
   {
     path: '/login',
@@ -29,3 +29,5 @@ export default new Router({
   }
   ]
 })
+
+export default router;

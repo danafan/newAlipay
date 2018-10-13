@@ -1,25 +1,41 @@
 <template>
   <div id="app">
-     <router-view></router-view>
-  </div>
+   <router-view></router-view>
+ </div>
 </template>
 
 <script>
-import login from './components/login.vue'
+  import resource from './api/resource.js'
+  import login from './components/login.vue'
 
-export default {
-  name: 'app',
-  created(){
-    this.$router.push('/index');
+  export default {
+    name: 'app',
+    created(){
+      resource.loginCheck().then(res => {
+        if(res.data.code == '1'){
+          sessionStorage.setItem("username",res.data.name);
+          let tab = sessionStorage.getItem("tab");
+          if(!!tab){
+            this.$router.push(tab);
+          }else{
+            this.$router.push('/home');
+          }
+        }else{
+          this.$router.push('/login');
+        }
+      });
+    }
+
   }
-  
-}
 </script>
 
 <style>
 *{
   padding: 0;
   margin: 0;
+}
+body,html{
+  font-family: SourceHanSansSC-Regular;
 }
 div{
   box-sizing: border-box;

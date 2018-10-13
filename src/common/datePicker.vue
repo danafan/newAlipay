@@ -13,13 +13,13 @@
 		</el-select>
 		<!-- 按日或按月 -->
 		<div class="selectime">
-			<div class="timeItem" :class="{'selTimeItem':isDay == 0}" @click="isDay = 0">按日</div>
-			<div class="timeItem" :class="{'selTimeItem':isDay == 1}" @click="isDay = 1">按月</div>
+			<div class="timeItem" :class="{'selTimeItem':isDay == 1}" @click="isDay = 1">按日</div>
+			<div class="timeItem" :class="{'selTimeItem':isDay == 2}" @click="isDay = 2">按月</div>
 		</div>
 		<!-- 时间区间 -->
 		<div class="block">
 			<div class="demonstration">查询时间</div>
-			<div class="day" v-if="isDay == 0">
+			<div class="day" v-show="isDay == 1">
 				<el-date-picker
 				v-model="daySector"
 				type="daterange"
@@ -31,7 +31,7 @@
 				@change="changeDay">
 			</el-date-picker>
 		</div>
-		<div class="month" v-else>
+		<div class="month" v-show="isDay == 2">
 			<el-date-picker
 			v-model="start"
 			type="month"
@@ -54,12 +54,12 @@
 </div>
 </div>
 <div class="selAli">
-	<el-select v-model="selAli" placeholder="支付宝账号" @change="changeNum">
+	<el-select v-model="selAli" filterable placeholder="支付宝账号">
 		<el-option
-		v-for="item in aliList"
+		v-for="item in alipay"
 		:key="item.id"
-		:label="item.value"
-		:value="item.value"
+		:label="item.alipay_name"
+		:value="item.id"
 		>
 	</el-option>
 </el-select>
@@ -128,8 +128,8 @@
 				dateList:[{id:"1",value:"近一周"},{id:"2",value:"近一个月"}],//走势区间列表
 				value:"",						   //选中的区间（展示）
 				weekStart:"",			 		   //选中的走势起始时间(可传递)
-				isDay:0,						   //默认选中按日查询
-				daySector:"",					   //选中的日期区间（可传递）				
+				isDay:1,						   //默认选中按日查询
+				daySector:null,					   //选中的日期区间（可传递）				
 				pickerOptions1: {
 					disabledDate(time) {
 						return time.getTime() > Date.now();
@@ -149,18 +149,23 @@
 				},
 				start:"",							//选中的初始月（可传递）
 				end:"",								//选中的结束月（可传递）
-				aliList:[{id:"1",value:"13067882143"},{id:"2",value:"15067452143"},{id:"3",value:"13836483838"}],		  //支付宝账号列表
 				selAli:"",						    //选中的账号的id
+			}
+		},
+		props:{
+			alipay:{
+				type:Array,
+				default:[]
 			}
 		},
 		watch:{
 			//监听按日或按月查询条件
 			isDay:function(n){
-				if(n == 0){
+				if(n == 1){
 					this.start = "";
 					this.end = "";
 				}else{
-					this.daySector = "";
+					this.daySector = null;
 				};
 			}
 		},
@@ -173,11 +178,10 @@
 				}else if(val == "2"){	//近一个月
 					this.weekStart = new Date(date-31*24*3600*1000).getTime();
 				};
-				this.isDay = 0;
-				this.daySector = "";
+				this.isDay = 1;
+				this.daySector = null;
 				this.start = "";
 				this.end = "";
-				console.log(this.weekStart);
 			},
 			//监听按日选择的日期
 			changeDay(val){
@@ -185,43 +189,58 @@
 				this.weekStart = "";
 				this.start = "";
 				this.end = "";
-				console.log(val);
+				this.daySector = val
 			},
 			//监听按月选择的初始月
 			changeStart(val){
 				this.value = "";
 				this.weekStart = "";
-				this.daySector = "";
-				console.log(val);
+				this.daySector = null;
 			},
 			//监听按月选择的结束月
 			changeEnd(val){
 				this.value = "";
 				this.weekStart = "";
-				this.daySector = "";
-				console.log(val);
-			},
-			//监听选择的支付宝账号
-			changeNum(val){
-				console.log(val);
+				this.daySector = null;
 			},
 			//点击查询
 			seach(){
-				let obj = {type:this.isDay};
+				let obj = {bill_type:this.isDay,alipay_account_id:this.selAli};
 				if(this.weekStart != ""){				//走势图
-					obj.startTime = this.weekStart;
-					obj.endTime = new Date().getTime();
+					obj.start_time = this.weekStart;
+					obj.end_time = new Date().getTime();
 				}
-				if(this.daySector != ""){				//日区间
-					obj.startTime = this.daySector[0];
-					obj.endTime = this.daySector[1];
+				if(!!this.daySector){					//日区间
+					obj.start_time = this.daySector[0];
+					obj.end_time = this.daySector[1];
 				}
-				if(this.isDay == 1){	//月区间
-					if(this.start != "" && this.end != ""){
-						obj.startTime = this.start;
-						obj.endTime = this.end;
+				// if(this.isDay == 2){					//月区间
+				// 	if(this.start != "" && this.end != ""){
+				// 		obj.start_time = this.start;
+				// 		obj.end_time = this.end;
+				// 	}else{
+				// 		this.$message.error("请填写正确的时间区间");
+				// 		return;
+				// 	}
+				// }
+				if(this.weekStart == "" && !this.daySector){
+					if(this.isDay == 2){
+						if(!this.start && !this.end){
+							obj.start_time = "";
+							obj.end_time = "";
+						}else if(!this.start && !!this.end){
+							this.$message.error("请填写开始月");
+							return;
+						}else if(!!this.start && !this.end){
+							this.$message.error("请填写结束月");
+							return;
+						}else{
+							obj.start_time = this.start;
+							obj.end_time = this.end;
+						}
 					}else{
-						this.$message.error("请填写正确的时间区间");
+						obj.start_time = "";
+						obj.end_time = "";
 					}
 				}
 				this.$emit("change",obj);

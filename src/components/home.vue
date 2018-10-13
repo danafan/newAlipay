@@ -13,8 +13,8 @@
 							收入订单
 						</div>
 						<div class="number">
-							<div class="money">¥1248</div>
-							<div class="count">1201笔</div>
+							<div class="money">¥{{yeasterDay.income_money}}</div>
+							<div class="count">{{yeasterDay.income_orders}}笔</div>
 						</div>
 					</div>
 					<div class="orderItem">
@@ -23,18 +23,18 @@
 							支出订单
 						</div>
 						<div class="number">
-							<div class="money">¥1248</div>
-							<div class="count">1201笔</div>
+							<div class="money">¥{{yeasterDay.disburse_money}}</div>
+							<div class="count">{{yeasterDay.disburse_orders}}笔</div>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="selCode">
-				<el-select v-model="selNum" placeholder="选择账号" @change="changeNum">
+				<el-select v-model="selNum" filterable placeholder="选择账号" @change="changeNum">
 					<el-option
 					v-for="item in accountList"
 					:key="item.id"
-					:label="item.value"
+					:label="item.alipay_name"
 					:value="item.id"
 					>
 				</el-option>
@@ -44,11 +44,11 @@
 	<div class="bottom">
 		<!-- 查询条件弹框 -->
 		<div class="date">
-			<datePicker @change="callback"></datePicker>
-		</div>
-		<div class="title">
-			<div class="txt">收入支出走势</div>
-			<div class="val">{{time}}</div>
+			<datePicker :alipay="accountList" @change="callback"></datePicker>
+			<div class="title">
+				<div class="txt">收入支出走势</div>
+				<div class="val">{{time}}</div>
+			</div>
 		</div>
 		<div id="Statistics"></div>
 	</div>
@@ -130,52 +130,93 @@
 		box-shadow: 0rem 0.2rem 0.46rem 0.04rem 
 		rgba(233, 232, 232, 0.82);
 		border-radius: 0.2rem;
-		.title{
-			margin-top: 1.2rem;
-			width: 100%;
-			text-align:center;
-			.txt{
-				font-size: .8rem;
-				color:#333;
-			}
-			.val{
-				font-size: .6rem;
-				color:#666;
+		display:flex;
+		flex-direction: column;
+		.date{
+			height: 7rem;
+			.title{
+				margin-top: 1.2rem;
+				width: 100%;
+				text-align:center;
+				.txt{
+					font-size: .8rem;
+					color:#333;
+				}
+				.val{
+					font-size: .6rem;
+					color:#666;
+				}
 			}
 		}
 		#Statistics{
 			width: 100%;
-			height: 26rem;
+			flex:1;
 		}
 	}
 }
-
 </style>
 <script>
+	import resource from '../api/resource.js'
 	import datePicker from '../common/datePicker.vue'
 	var echarts = require('echarts/lib/echarts');
 	require("echarts/lib/chart/line");				//折线图
 	require('echarts/lib/component/tooltip');
+	require('echarts/lib/component/legend');
 	export default{
 		data(){
 			return{
-				accountList:[{id:"1",value:"13067882143"},{id:"2",value:"15067452143"},{id:"3",value:"13836483838"}],		//账号列表
+				accountList:[],						  //账号列表
 				selNum:"",						   	  //选中的账号的id
-				time:"2018-09-25—2018-10-3",		  //选中的日期区间
+				yeasterDay:{},						  //昨日报表数据(res)
+				time:"全部",		  					  //选中的日期区间
+				lineObj:{},						      //折线数据
 			}
 		},
-		mounted() {
-			// 当月访问量统计
-			this.drawLine();
-		},
-		methods:{
+		created(){
+			//获取支付宝账户列表
+			this.getAlipay();
+      		//获取顶部昨日报表
+      		this.yesterdayList();
+      		//获取底部折线图数据
+      		let obj = {
+      			alipay_account_id: "",
+      			bill_type: 1,
+      			end_time: "",
+      			start_time: "",
+      		}
+      		this.getLine(obj);
+      	},
+      	methods:{
 			//监听选择账号的变化
 			changeNum(val){
-				console.log(val);
+				this.selNum = val;
+				//获取顶部昨日报表
+				this.yesterdayList();
 			},
 			//监听子组件传递过来的查询条件
 			callback(val){
-				console.log(val);
+				if(!!val.end_time && !!val.start_time){
+					this.time = "hahah 全部";
+					if(val.bill_type == 1){
+						var date1 = new Date(val.start_time);
+						var Y1 = date1.getFullYear() + '-';
+						var M1 = (date1.getMonth()+1 < 10 ? '0'+(date1.getMonth()+1) : date1.getMonth()+1) + '-';
+						var D1 = (date1.getDate() < 0 ? '0' + (date1.getDate()) : date1.getDate());
+						var starTime = Y1 + M1 + D1;
+						var date2 = new Date(val.end_time);
+						var Y2 = date2.getFullYear() + '-';
+						var M2 = (date2.getMonth()+1 < 10 ? '0'+(date2.getMonth()+1) : date2.getMonth()+1) + '-';
+						var D2 = (date2.getDate() < 0 ? '0' + (date2.getDate()) : date2.getDate());
+						var endTime = Y2 + M2 + D2;
+						this.time = starTime + " -- " + endTime;
+					}else{
+						this.time = val.start_time + " -- " + val.end_time;
+					}
+				}else{	
+					this.time = "全部";
+				}
+				//获取底部折线图数据
+				this.getLine(val);
 			},
 			// 当月访问量统计
 			drawLine() {
@@ -186,69 +227,128 @@
       				tooltip: {
       					trigger: 'axis'
       				},
-      				xAxis: {
-      					type: 'category',
-      					boundaryGap: false,
-      					axisTick:{
+      				legend: {
+      					left:'7%',
+      					top:"20",
+      					data: [{
+      						name: '收入',
+    						// 强制设置图形为圆。
+    						icon: 'circle',
+    						// 设置文本为红色
+    						textStyle: {
+    							color: 'red'
+    						}
+    					},
+    					{
+    						name: '支出',
+    						// 强制设置图形为圆。
+    						icon: 'circle',
+    						// 设置文本为红色
+    						textStyle: {
+    							color: 'red'
+    						}
+    					},
+    					{
+    						name: '开始金额',
+    						// 强制设置图形为圆。
+    						icon: 'circle',
+    						// 设置文本为红色
+    						textStyle: {
+    							color: 'red'
+    						}
+    					},
+    					{
+    						name: '结束金额',
+    						// 强制设置图形为圆。
+    						icon: 'circle',
+    						// 设置文本为红色
+    						textStyle: {
+    							color: 'red'
+    						}
+    					}]
+    				},
+    				xAxis: {
+    					type: 'category',
+    					boundaryGap: false,
+    					axisTick:{
 	        				alignWithLabel:true,	//刻度左右有留白
-      						interval:2,				//强制显示每一个刻度
       						inside:true,			//坐标轴线朝内
       					},
-      					axisLabel:{
-      						interval:2,				//强制显示每一个刻度标签
-      					},
-      					data: ['周一','周二','周三','周四','周五','周六','周日','周一','周二','周三','周四','周五','周六','周日']
+      					data: this.lineObj.dates
       				},
       				yAxis: {
       					type: 'value'
       				},
       				series: [
       				{
-      					name:'邮件营销',
+      					name:'收入',
       					type:'line',
-      					data:[120, 132, 101, 134, 90, 230, 210]
+      					data:this.lineObj.income
       				},
       				{
-      					name:'联盟广告',
+      					name:'支出',
       					type:'line',
-      					data:[220, 182, 191, 234, 290, 330, 310]
+      					data:this.lineObj.disburse
       				},
       				{
-      					name:'视频广告',
+      					name:'开始金额',
       					type:'line',
-      					data:[150, 232, 201, 154, 190, 330, 410]
+      					data:this.lineObj.start_balance
       				},
       				{
-      					name:'直接访问',
+      					name:'结束金额',
       					type:'line',
-      					data:[320, 332, 301, 334, 390, 330, 320]
-      				},
-      				{
-      					name:'搜索引擎',
-      					type:'line',
-      					data:[820, 932, 901, 934, 1290, 1330, 1320]
+      					data:this.lineObj.end_balance
       				}
       				]
       			});
       		},
-      		//获取当前月的所有日期
-      		getDates(){
-      			let daysOfMonth = [];
-      			let fullYear = new Date().getFullYear();
-      			let month = new Date().getMonth() + 1;
-      			let lastDayOfMonth = new Date(fullYear, month, 0).getDate();
-      			for (var i = 1; i <= lastDayOfMonth; i++) {
-      				daysOfMonth.push(i);
-      			};
-      			return daysOfMonth;
+            //获取支付宝账户列表
+            getAlipay(){
+            	resource.aliPayList().then(res => {
+            		if(res.data.code == "1"){
+            			this.accountList = res.data.data;
+            			let obj = {
+            				id:"",
+            				alipay_name:"全部"
+            			}
+            			this.accountList.unshift(obj);
+            		}else{
+            			this.$message({
+            				message: res.data.message,
+            				type: 'warning'
+            			});
+            		}
+            	});
+            },
+      		//获取顶部昨日报表
+      		yesterdayList(){
+      			resource.yesterdayList({alipay_account_id:this.selNum}).then(res => {
+      				if(res.data.code == "1"){
+      					this.yeasterDay = res.data.data;
+      				}else{
+      					this.$message({
+      						message: res.data.message,
+      						type: 'warning'
+      					});
+      				}
+      			});
       		},
-      		//获取当前月的所有日期
-      		getMonths(){
-      			let daysOfMonth = [];
-      			let fullYear = new Date().getFullYear();
-      			let month = new Date().getMonth() + 1;
-      			return "(" + fullYear + "年" + month + "月" + ")";
-      		},
+      		//获取底部折线图数据
+      		getLine(val){
+      			resource.inCondition(val).then(res => {
+      				if(res.data.code == "1"){
+      					this.lineObj = res.data.data;
+      					// 当月访问量统计
+      					this.drawLine();
+      				}else{
+      					this.$message({
+      						message: res.data.message,
+      						type: 'warning'
+      					});
+      				}
+      			});
+      		}
       	},
       	components:{
       		datePicker
