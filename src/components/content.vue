@@ -329,6 +329,7 @@
 			},
 			//点击查询按钮
 			seach(){
+				this.loading = true;
 				sessionStorage.removeItem("initDate");
 				let obj = {
 					alipay_account_id:this.selNum,
@@ -343,6 +344,7 @@
 			},
 			//监听每页条数
 			handleSizeChange(val) {
+				this.loading = true;
 				this.pagesize = val;
 				let obj = {
 					alipay_account_id:this.selNum,
@@ -357,6 +359,7 @@
 			},
 			//监听页码的改变
 			handleCurrentChange(val) {
+				this.loading = true;
 				this.page = val;
 				let obj = {
 					alipay_account_id:this.selNum,

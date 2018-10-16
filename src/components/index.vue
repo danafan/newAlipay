@@ -99,6 +99,9 @@
 				.selItem{
 					line-height: 2rem;
 				}
+				.selItem:hover{
+					color: #24a0fd;
+				}
 				.selectedItem{
 					color: #24a0fd;
 				}

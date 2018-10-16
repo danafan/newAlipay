@@ -184,7 +184,6 @@
 			}
 		}
 	}
-	
 	.tabel{
 		flex: 1;
 		margin-top: 1rem;
@@ -431,6 +430,7 @@
 			},
 			//查询列表
 			serach(){
+				this.loading = true;
 				let obj = {
 					alipay_account_id:this.name,
 					page:1,
@@ -544,6 +544,7 @@
     		},
     		//切换页码
     		handleCurrentChange(val) {
+    			this.loading = true;
     			this.page = val;
     			let obj = {
     				alipay_account_id:this.name,
@@ -555,6 +556,7 @@
     		},
     		//切换每页条数
     		handleSizeChange(val) {
+    			this.loading = true;
     			this.pagesize = val;
     			let obj = {
     				alipay_account_id:this.name,

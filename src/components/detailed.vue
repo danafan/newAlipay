@@ -13,10 +13,8 @@
 			</div>
 			<!-- 总统计 -->
 			<div class="biao">
-				<div>初始总额：{{init_total}}</div>
 				<div>总收入：{{income_total}}</div>
 				<div>总支出：{{disburse_total}}</div>
-				<div>最终金额：{{final_total}}</div>
 			</div>
 		</div>
 		<!-- 表格 -->
@@ -30,7 +28,7 @@
 					<template slot-scope="scope">
 						<el-popover trigger="hover" placement="top">
 							<p v-for="item in incomeList">{{item | updateIncome}}</p>
-							<div slot="reference" class="blue" @mouseenter="mouseEnter(scope.row)">
+							<div slot="reference" class="blue" @mouseenter="mouseEnter(scope.row,1)">
 								{{ scope.row.income }}
 							</div>
 						</el-popover>
@@ -38,7 +36,12 @@
 				</el-table-column>
 				<el-table-column label="支出" style="width: 10%">
 					<template slot-scope="scope">
-						<p class="hong">{{scope.row.disburse}}</p>
+						<el-popover trigger="hover" placement="top">
+							<p v-for="item in incomeList">{{item | updateIncome}}</p>
+							<div slot="reference" class="hong" @mouseenter="mouseEnter(scope.row,2)">
+								{{ scope.row.disburse }}
+							</div>
+						</el-popover>
 					</template>
 				</el-table-column>
 				<el-table-column prop="final_balance" label="最终余额" style="width: 10%"> </el-table-column>
@@ -77,7 +80,7 @@
 	display:flex;
 	flex-direction: column;
 	.han{
-		height: 10rem;
+		height: 11rem;
 		.title{
 			position: relative;
 			width: 100%;
@@ -109,12 +112,11 @@
 			margin-top: 2.45rem;
 			display: flex;
 			align-items: center;
-			justify-content: space-between;
+			justify-content: space-around;
 			font-size: .8rem;
 			color: #333;
 		}
 	}
-	
 	.tabel{
 		flex: 1;
 		display:flex;
@@ -131,7 +133,6 @@
 			justify-content:flex-end;
 		}
 	}
-	
 }
 </style>
 <style>
@@ -166,9 +167,7 @@
 				end_time:"",			
 				alipay_account_id:"",	
 				disburse_total:"0",		//总支出
-				final_total:"0",		//最终金额
 				income_total:"0",		//总收入
-				init_total:"0",			//初始余额
 				incomeList:[],			//收入详情
 				loading:true
 			}
@@ -190,10 +189,16 @@
 		},
 		methods:{
 			//鼠标移入收入查看详情
-			mouseEnter(val){
+			mouseEnter(val,type){
+				this.incomeList = [];
 				let obj = {
 					alipay_name:val.bill_account,
 					bill_date:val.bill_date
+				}
+				if(type == 1){
+					obj.type = 1;
+				}else{
+					obj.type = 0;
 				}
 				resource.businessData(obj).then(res => {
 					if(res.data.code == '1'){
@@ -246,13 +251,12 @@
             	this.bill_type = val.bill_type;
             	this.start_time = val.start_time;
             	this.end_time = val.end_time;
-
             	this.page = 1;
             	this.pagesize = 10;
             	val.page = this.page;
             	val.pagesize = this.pagesize;
-            	
             	//获取列表
+            	this.loading = true;
             	this.getList(val);
             },
             //获取列表
@@ -265,10 +269,8 @@
             				this.tableData = [];
             			}else{
 							this.tableData = res.data.list;					//列表
-							this.disburse_total = res.data.disburse_total;			//总支出
-							this.final_total = res.data.final_total;	  	//最终金额
+							this.disburse_total = res.data.disburse_total;	//总支出
 							this.income_total = res.data.income_total;  	//总收入
-							this.init_total = res.data.init_total;	  		//初始余额
 						}
 						this.total = res.data.total;						//总条数
 					}else{
@@ -295,10 +297,11 @@
 			lookDetail(val){
 				sessionStorage.setItem("tab",'/content');
 				sessionStorage.setItem("initDate",val.bill_date);
-				this.$router.replace('/content');
+				this.$router.push('/content');
 			},
 			//切换页条数
 			handleSizeChange(val) {
+				this.loading = true;
 				this.pagesize = val;
 				let obj = {
 					alipay_account_id:"",
@@ -313,6 +316,7 @@
 			},
 			//切换页码
 			handleCurrentChange(val) {
+				this.loading = true;
 				this.page = val;
 				let obj = {
 					alipay_account_id:"",

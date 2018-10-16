@@ -13,8 +13,8 @@
 		</el-select>
 		<!-- 按日或按月 -->
 		<div class="selectime">
-			<div class="timeItem" :class="{'selTimeItem':isDay == 1}" @click="isDay = 1">按日</div>
-			<div class="timeItem" :class="{'selTimeItem':isDay == 2}" @click="isDay = 2">按月</div>
+			<div class="timeItem" :class="{'selTimeItem':isDay == 1}" @click="changeIsDay(1)">按日</div>
+			<div class="timeItem" :class="{'selTimeItem':isDay == 2}" @click="changeIsDay(2)">按月</div>
 		</div>
 		<!-- 时间区间 -->
 		<div class="block">
@@ -129,7 +129,7 @@
 				value:"",						   //选中的区间（展示）
 				weekStart:"",			 		   //选中的走势起始时间(可传递)
 				isDay:1,						   //默认选中按日查询
-				daySector:null,					   //选中的日期区间（可传递）				
+				daySector:null,					   //选中的日期区间（可传递）			
 				pickerOptions1: {
 					disabledDate(time) {
 						return time.getTime() > Date.now();
@@ -158,17 +158,6 @@
 				default:[]
 			}
 		},
-		watch:{
-			//监听按日或按月查询条件
-			isDay:function(n){
-				if(n == 1){
-					this.start = "";
-					this.end = "";
-				}else{
-					this.daySector = null;
-				};
-			}
-		},
 		methods:{
 			//监听选择走势周的变化
 			changeDate(val){
@@ -182,6 +171,20 @@
 				this.daySector = null;
 				this.start = "";
 				this.end = "";
+			},
+			//监听切换按日或者按月
+			changeIsDay(index){
+				if(this.isDay != index){
+					this.isDay = index;
+					this.weekStart = "";
+					this.value = "";
+					if(index == 1){
+						this.start = "";
+						this.end = "";
+					}else{
+						this.daySector = null;
+					};
+				}
 			},
 			//监听按日选择的日期
 			changeDay(val){

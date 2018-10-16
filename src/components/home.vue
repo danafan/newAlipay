@@ -196,7 +196,6 @@
 			//监听子组件传递过来的查询条件
 			callback(val){
 				if(!!val.end_time && !!val.start_time){
-					this.time = "hahah 全部";
 					if(val.bill_type == 1){
 						var date1 = new Date(val.start_time);
 						var Y1 = date1.getFullYear() + '-';
@@ -221,7 +220,7 @@
 			// 当月访问量统计
 			drawLine() {
       			// 当月访问量统计
-      			let myChart = echarts.init(document.getElementById('Statistics'))
+      			let myChart = echarts.init(document.getElementById('Statistics'));
       			// 绘制图表
       			myChart.setOption({
       				tooltip: {
@@ -265,7 +264,11 @@
     						textStyle: {
     							color: 'red'
     						}
-    					}]
+    					}],
+    					selected: {
+    						'开始金额': false,
+    						'结束金额': false
+    					}
     				},
     				xAxis: {
     					type: 'category',
@@ -338,8 +341,7 @@
       		getLine(val){
       			resource.inCondition(val).then(res => {
       				if(res.data.code == "1"){
-      					this.lineObj = res.data.data;
-      					// 当月访问量统计
+      					this.lineObj = res.data.data;     // 当月访问量统计
       					this.drawLine();
       				}else{
       					this.$message({
