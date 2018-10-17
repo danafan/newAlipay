@@ -257,7 +257,7 @@
 					cancelButtonText: '取消',
 					type: 'warning'
 				}).then(() => {
-					let href = "http://alipay.ppg8090.com/api/index/exportalipaybilldetail?business_type=" + this.selType + "&alipay_account_id=" + this.selNum + "&start_date=" + this.startTime + "&end_date=" + this.endTime;
+					let href = "http://alipay.ppg8090.com/api/index/exportalipaybilldetail?business_type=" + this.selType + "&alipay_account_id=" + this.selNum + "&start_date=" + this.startTime + "&end_date=" + this.endTime ;
 					window.open(href);
 				}).catch(() => {
 					this.$message({
@@ -331,6 +331,8 @@
 			seach(){
 				this.loading = true;
 				sessionStorage.removeItem("initDate");
+				this.startTime = !!this.daySector ? this.daySector[0] : "";
+				this.endTime = !!this.daySector ? this.daySector[1] : "";
 				let obj = {
 					alipay_account_id:this.selNum,
 					business_type:this.selType,
