@@ -12,7 +12,6 @@ const content = resolve=>require(['@/components/content'],resolve)
 Vue.use(Router)
 
 const router = new Router({
-  mode:"history",
   routes: [
   {
     path: '/login',

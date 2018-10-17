@@ -169,6 +169,7 @@
 		},
 		watch:{
 			$route(n){
+				sessionStorage.setItem("tab",n.path);
 				if(n.path == "/home"){
 					this.tabList[0].default = true;
 					this.tabList[1].default = false;
