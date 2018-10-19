@@ -176,11 +176,18 @@
 			this.text = "正在加载...";
 			//获取支付宝账户列表
 			this.getAlipay();
+			let date = new Date(new Date().setDate(1));
+			date.setHours(0);
+			date.setMinutes(0);
+			date.setSeconds(0);
+			date.setMilliseconds(0);
+			this.start_time = date.getTime();
+			this.end_time = new Date(new Date().getTime() - 24*60*60*1000).getTime();
 			let obj = {
 				alipay_account_id:"",
 				bill_type:1,
-				end_time:"",
-				start_time:"",
+				end_time:this.end_time,
+				start_time:this.start_time,
 				page:this.page,
 				pagesize:this.pagesize
 			}
@@ -297,6 +304,7 @@
 			lookDetail(val){
 				sessionStorage.setItem("tab",'/content');
 				sessionStorage.setItem("initDate",val.bill_date);
+				sessionStorage.setItem("selname",val.bill_account);
 				this.$router.push('/content');
 			},
 			//切换页条数
@@ -306,8 +314,8 @@
 				let obj = {
 					alipay_account_id:"",
 					bill_type:1,
-					end_time:"",
-					start_time:"",
+					end_time:this.end_time,
+					start_time:this.start_time,
 					page:this.page,
 					pagesize:this.pagesize
 				}
@@ -321,8 +329,8 @@
 				let obj = {
 					alipay_account_id:"",
 					bill_type:1,
-					end_time:"",
-					start_time:"",
+					end_time:this.end_time,
+					start_time:this.start_time,
 					page:this.page,
 					pagesize:this.pagesize
 				}

@@ -178,11 +178,16 @@
       		//获取顶部昨日报表
       		this.yesterdayList();
       		//获取底部折线图数据
+      		let date = new Date(new Date().setDate(1));
+      		date.setHours(0);
+      		date.setMinutes(0);
+      		date.setSeconds(0);
+      		date.setMilliseconds(0);
       		let obj = {
       			alipay_account_id: "",
       			bill_type: 1,
       			end_time: "",
-      			start_time: "",
+      			start_time: date.getTime(),
       		}
       		this.getLine(obj);
       	},

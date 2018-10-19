@@ -129,7 +129,7 @@
 				value:"",						   //选中的区间（展示）
 				weekStart:"",			 		   //选中的走势起始时间(可传递)
 				isDay:1,						   //默认选中按日查询
-				daySector:null,					   //选中的日期区间（可传递）			
+				daySector:[new Date().setDate(1),new Date(new Date().getTime() - 24*60*60*1000)], //选中的日期区间（可传递）			
 				pickerOptions1: {
 					disabledDate(time) {
 						return time.getTime() > Date.now();
@@ -211,7 +211,7 @@
 				let obj = {bill_type:this.isDay,alipay_account_id:this.selAli};
 				if(this.weekStart != ""){				//走势图
 					obj.start_time = this.weekStart;
-					obj.end_time = new Date().getTime();
+					obj.end_time = new Date(new Date(new Date()-1*24*3600*1000)).getTime();
 				}
 				if(!!this.daySector){					//日区间
 					obj.start_time = this.daySector[0];

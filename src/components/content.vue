@@ -5,7 +5,7 @@
 			<div class="seachBox">
 				<div class="kua">
 					<div class="type">业务类型</div>
-					<el-select v-model="selType" @change="changeType">
+					<el-select v-model="selType" filterable>
 						<el-option
 						v-for="item in typeList"
 						:key="item.business_type"
@@ -28,7 +28,7 @@
 				@change="changeDay">
 			</el-date-picker>
 		</div>
-		<el-select v-model="selNum" placeholder="支付宝账号" filterable @change="changeNum">
+		<el-select v-model="selNum" placeholder="支付宝账号" filterable>
 			<el-option
 			v-for="item in accountList"
 			:key="item.id"
@@ -179,7 +179,6 @@
 			justify-content:flex-end;
 		}
 	}
-	
 }
 </style>
 <style>
@@ -204,7 +203,7 @@
 		data(){
 			return{
 				typeList:[],				//业务类型列表
-				selType:"",					//选中的业务类型
+				selType:"全部",				//选中的业务类型
 				accountList:[],				//支付宝账号列表
 				tableData: [],				//明细列表
 				pickerOptions1: {
@@ -216,6 +215,7 @@
 				startTime:"",				//开始时间
 				endTime:"",					//结束时间
 				selNum:"",					//选中的账号的id
+				selname:"",					//某一条的账号名称
 				total:0,					//总条数
 				page: 1,					//当前页码
 				pagesize:10,				//每页条数
@@ -225,7 +225,11 @@
 		created(){
 			//获取支付宝明细
 			let date = sessionStorage.getItem("initDate");
+			this.selname = sessionStorage.getItem("selname");
 			if(!!date){
+				this.daySector = [date,date];
+				this.startTime = date;
+				this.endTime = date;
 				let obj = {
 					init_date:date,
 					page:this.page,
@@ -244,10 +248,11 @@
 				//获取支付宝明细
 				this.getAlipayBill(obj);
 			}
-			//获取业务类型
-			this.getbisType();
+			
 			//获取支付宝账户列表
 			this.getAlipay();
+			//获取业务类型
+			this.getbisType();
 		},
 		methods:{
 			//导出
@@ -257,8 +262,12 @@
 					cancelButtonText: '取消',
 					type: 'warning'
 				}).then(() => {
-					let href = "http://alipay.ppg8090.com/api/index/exportalipaybilldetail?business_type=" + this.selType + "&alipay_account_id=" + this.selNum + "&start_date=" + this.startTime + "&end_date=" + this.endTime ;
-					window.open(href);
+					let type = "";
+					if(this.selType != "全部"){
+						type = this.selType;
+					}
+					let href = "http://alipay.ppg8090.com/api/index/exportalipaybilldetail?business_type=" + type + "&alipay_account_id=" + this.selNum + "&start_date=" + this.startTime + "&end_date=" + this.endTime ;
+						window.open(href);
 				}).catch(() => {
 					this.$message({
 						type: 'info',
@@ -271,6 +280,10 @@
 				resource.businessType().then(res => {
 					if(res.data.code == '1'){
 						this.typeList = res.data.data;
+						let obj = {
+							business_type:"全部"
+						}
+						this.typeList.unshift(obj);
 					}else{
 						this.$message({
 							message: res.data.message,
@@ -278,10 +291,6 @@
 						});
 					}
 				});
-			},
-			//修改业务类型
-			changeType(val){
-				this.selType = val;
 			},
 			//获取支付宝账户列表
 			getAlipay(){
@@ -293,6 +302,7 @@
 							alipay_name:"全部"
 						}
 						this.accountList.unshift(obj);
+						this.selNum = this.setf(this.accountList)[0].id;
 					}else{
 						this.$message({
 							message: res.data.message,
@@ -300,6 +310,9 @@
 						});
 					}
 				});
+			},
+			setf(arr){
+				return arr.filter(item => item.alipay_name == this.selname);
 			},
 			//获取支付宝明细
 			getAlipayBill(obj){
@@ -323,21 +336,19 @@
 			changeDay(val){
 				this.daySector = val;
 			},
-			//监听账号切换
-			changeNum(val){
-				console.log(val);
-			},
 			//点击查询按钮
 			seach(){
 				this.loading = true;
 				sessionStorage.removeItem("initDate");
 				this.startTime = !!this.daySector ? this.daySector[0] : "";
 				this.endTime = !!this.daySector ? this.daySector[1] : "";
+				this.page = 1;
+				this.pagesize = 10;
 				let obj = {
 					alipay_account_id:this.selNum,
-					business_type:this.selType,
-					start_date:!!this.daySector ? this.daySector[0] : "",
-					end_date:!!this.daySector ? this.daySector[1] : "",
+					business_type:this.selType == "全部" ? "" : this.selType,
+					start_date:this.startTime,
+					end_date:this.endTime,
 					page:this.page,
 					pagesize:this.pagesize
 				};
@@ -351,8 +362,8 @@
 				let obj = {
 					alipay_account_id:this.selNum,
 					business_type:this.selType,
-					start_date:!!this.daySector ? this.daySector[0] : "",
-					end_date:!!this.daySector ? this.daySector[1] : "",
+					start_date:this.startTime,
+					end_date:this.endTime,
 					page:this.page,
 					pagesize:this.pagesize
 				};
@@ -366,8 +377,8 @@
 				let obj = {
 					alipay_account_id:this.selNum,
 					business_type:this.selType,
-					start_date:!!this.daySector ? this.daySector[0] : "",
-					end_date:!!this.daySector ? this.daySector[1] : "",
+					start_date:this.startTime,
+					end_date:this.endTime,
 					page:this.page,
 					pagesize:this.pagesize
 				};
