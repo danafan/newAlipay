@@ -129,7 +129,7 @@
 				value:"",						   //选中的区间（展示）
 				weekStart:"",			 		   //选中的走势起始时间(可传递)
 				isDay:1,						   //默认选中按日查询
-				daySector:[new Date().setDate(1),new Date(new Date().getTime() - 24*60*60*1000)], //选中的日期区间（可传递）			
+				daySector:[new Date().setDate(1),new Date().getTime() - 24*60*60*1000], //选中的日期区间（可传递）			
 				pickerOptions1: {
 					disabledDate(time) {
 						return time.getTime() > Date.now();
@@ -192,7 +192,7 @@
 				this.weekStart = "";
 				this.start = "";
 				this.end = "";
-				this.daySector = val
+				this.daySector = val;
 			},
 			//监听按月选择的初始月
 			changeStart(val){
@@ -217,15 +217,6 @@
 					obj.start_time = this.daySector[0];
 					obj.end_time = this.daySector[1];
 				}
-				// if(this.isDay == 2){					//月区间
-				// 	if(this.start != "" && this.end != ""){
-				// 		obj.start_time = this.start;
-				// 		obj.end_time = this.end;
-				// 	}else{
-				// 		this.$message.error("请填写正确的时间区间");
-				// 		return;
-				// 	}
-				// }
 				if(this.weekStart == "" && !this.daySector){
 					if(this.isDay == 2){
 						if(!this.start && !this.end){
