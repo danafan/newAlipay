@@ -129,13 +129,13 @@
 				uasename: "",				//用户名
 				password: "",				//密码
 				code: "",					//验证码
-				codeURL:"http://alipay.ppg8090.com/api/login/captcha",
+				codeURL:"http://alipay.92nu.com/api/login/captcha",
 			}
 		},
 		methods:{
 			//点击更新验证码
 			upload(){
-				this.codeURL = "http://alipay.ppg8090.com/api/login/captcha?d=" + Math.random();
+				this.codeURL = "http://alipay.92nu.com/api/login/captcha?d=" + Math.random();
 			},
 			//点击登录
 			login(){

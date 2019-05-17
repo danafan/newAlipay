@@ -138,7 +138,7 @@
 				pickerOptions2: {
 					disabledDate(time) {
 						return time.getTime() > Date.now() - 8.64e7||
-						time.getTime() > new Date(that.end).getTime();;
+						time.getTime() > new Date(that.end).getTime();
 					}
 				},
 				pickerOptions3: {
@@ -166,7 +166,7 @@
 					this.weekStart = new Date(date-7*24*3600*1000).getTime();
 				}else if(val == "2"){	//近一个月
 					this.weekStart = new Date(date-31*24*3600*1000).getTime();
-				};
+				}
 				this.isDay = 1;
 				this.daySector = null;
 				this.start = "";
@@ -183,7 +183,7 @@
 						this.end = "";
 					}else{
 						this.daySector = null;
-					};
+					}
 				}
 			},
 			//监听按日选择的日期
@@ -195,13 +195,13 @@
 				this.daySector = val;
 			},
 			//监听按月选择的初始月
-			changeStart(val){
+			changeStart(){
 				this.value = "";
 				this.weekStart = "";
 				this.daySector = null;
 			},
 			//监听按月选择的结束月
-			changeEnd(val){
+			changeEnd(){
 				this.value = "";
 				this.weekStart = "";
 				this.daySector = null;
@@ -213,7 +213,7 @@
 					obj.start_time = this.weekStart;
 					obj.end_time = new Date(new Date(new Date()-1*24*3600*1000)).getTime();
 				}
-				if(!!this.daySector){					//日区间
+				if(this.daySector){					//日区间
 					obj.start_time = this.daySector[0];
 					obj.end_time = this.daySector[1];
 				}

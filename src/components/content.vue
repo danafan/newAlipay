@@ -211,6 +211,7 @@
 						return time.getTime() > Date.now();
 					}
 				},
+				default:new Date(),
 				daySector:null,				//选中的时间区间
 				startTime:"",				//开始时间
 				endTime:"",					//结束时间
@@ -226,12 +227,15 @@
 			//获取支付宝明细
 			let date = sessionStorage.getItem("initDate");
 			this.selname = sessionStorage.getItem("selname");
+			this.selNum = this.$route.query.id;		//选中的商家id
 			if(!!date){
-				this.daySector = [date,date];
+				// this.daySector = [date,date];
 				this.startTime = date;
 				this.endTime = date;
 				let obj = {
+					alipay_account_id:this.selNum,
 					init_date:date,
+					business_type:this.selType == "全部" ? "" : this.selType,
 					page:this.page,
 					pagesize:this.pagesize
 				}
@@ -239,16 +243,15 @@
 			}else{
 				let obj = {
 					alipay_account_id:this.selNum,
-					business_type:this.selType,
+					business_type:this.selType == "全部" ? "" : this.selType,
 					start_date:!!this.daySector ? this.daySector[0] : "",
 					end_date:!!this.daySector ? this.daySector[1] : "",
 					page:this.page,
 					pagesize:this.pagesize
 				};
-				//获取支付宝明细
-				this.getAlipayBill(obj);
-			}
-			
+						//获取支付宝明细
+						this.getAlipayBill(obj);
+					}
 			//获取支付宝账户列表
 			this.getAlipay();
 			//获取业务类型
@@ -266,8 +269,8 @@
 					if(this.selType != "全部"){
 						type = this.selType;
 					}
-					let href = "http://alipay.ppg8090.com/api/index/exportalipaybilldetail?business_type=" + type + "&alipay_account_id=" + this.selNum + "&start_date=" + this.startTime + "&end_date=" + this.endTime ;
-						window.open(href);
+					let href = "http://alipay.92nu.com/api/index/exportalipaybilldetail?business_type=" + type + "&alipay_account_id=" + this.selNum + "&start_date=" + this.startTime + "&end_date=" + this.endTime ;
+					window.open(href);
 				}).catch(() => {
 					this.$message({
 						type: 'info',
@@ -297,11 +300,11 @@
 				resource.aliPayList().then(res => {
 					if(res.data.code == "1"){
 						this.accountList = res.data.data;
-						let obj = {
-							id:"",
-							alipay_name:"全部"
-						}
-						this.accountList.unshift(obj);
+						// let obj = {
+						// 	id:"",
+						// 	alipay_name:"全部"
+						// }
+						// this.accountList.unshift(obj);
 						this.selNum = this.setf(this.accountList)[0].id;
 					}else{
 						this.$message({
@@ -361,7 +364,7 @@
 				this.pagesize = val;
 				let obj = {
 					alipay_account_id:this.selNum,
-					business_type:this.selType,
+					business_type:this.selType == "全部" ? "" : this.selType,
 					start_date:this.startTime,
 					end_date:this.endTime,
 					page:this.page,
@@ -376,7 +379,7 @@
 				this.page = val;
 				let obj = {
 					alipay_account_id:this.selNum,
-					business_type:this.selType,
+					business_type:this.selType == "全部" ? "" : this.selType,
 					start_date:this.startTime,
 					end_date:this.endTime,
 					page:this.page,
@@ -405,11 +408,8 @@
     			let m = (date.getMinutes() < 10 ? '0'+(date.getMinutes()) : date.getMinutes()) + ':';
     			let s = (date.getSeconds() < 10 ? '0'+(date.getSeconds()) : date.getSeconds());
     			return Y + M + D + " " + h + m + s;
-    		},
-    		
-    	},
-
-
+    		}	
+    	}
     }
 </script>
 

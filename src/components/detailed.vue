@@ -225,7 +225,7 @@
 					cancelButtonText: '取消',
 					type: 'warning'
 				}).then(() => {
-					let href = "http://alipay.ppg8090.com/api/index/exportalipaybilllist?bill_type=" + this.bill_type + "&alipay_account_id=" + this.alipay_account_id + "&start_time=" + this.start_time + "&end_time=" + this.end_time;
+					let href = "http://alipay.92nu.com/api/index/exportalipaybilllist?bill_type=" + this.bill_type + "&alipay_account_id=" + this.alipay_account_id + "&start_time=" + this.start_time + "&end_time=" + this.end_time;
 					window.open(href);
 				}).catch(() => {
 					this.$message({
@@ -305,14 +305,14 @@
 				sessionStorage.setItem("tab",'/content');
 				sessionStorage.setItem("initDate",val.bill_date);
 				sessionStorage.setItem("selname",val.bill_account);
-				this.$router.push('/content');
+				this.$router.push('/content?id=' + val.account_id);
 			},
 			//切换页条数
 			handleSizeChange(val) {
 				this.loading = true;
 				this.pagesize = val;
 				let obj = {
-					alipay_account_id:"",
+					alipay_account_id:this.alipay_account_id,
 					bill_type:1,
 					end_time:this.end_time,
 					start_time:this.start_time,
@@ -327,7 +327,7 @@
 				this.loading = true;
 				this.page = val;
 				let obj = {
-					alipay_account_id:"",
+					alipay_account_id:this.alipay_account_id,
 					bill_type:1,
 					end_time:this.end_time,
 					start_time:this.start_time,

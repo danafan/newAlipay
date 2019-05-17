@@ -401,7 +401,7 @@
         			cancelButtonText: '取消',
         			type: 'warning'
         		}).then(() => {
-        			let href = "http://alipay.ppg8090.com/api/finance/exportalipayaccountlist";
+        			let href = "http://alipay.92nu.com/api/finance/exportalipayaccountlist";
         			window.open(href)
         		}).catch(() => {
         			this.$message({
