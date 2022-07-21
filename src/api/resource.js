@@ -14,6 +14,11 @@ let path = {
 	alipayBill:"index/alipaybilldetail",			//支付宝明细
 	downAlipay:"finance/exportalipayaccountlist",	//导出支付宝管理
 	businessData:"index/get_business_data",			//鼠标移入收入详情
+	payTypeList:'paytype/paytypelist',				//支付类型列表
+	addPayType:'paytype/addpaytype',				//添加类型
+	editPayType:'paytype/editpaytype',				//编辑类型
+	delPayType:'paytype/delpaytype',				//删除支付类型
+	getPayTypes:'index/getpaytypes',				//支付类型列表
 	loginOut:"login/quitlogin",						//退出登录
 }
 export default{
@@ -77,17 +82,33 @@ export default{
 	businessData(params){
 		return http.post(path.businessData, params)
 	},
+	//支付类型列表
+	payTypeList(params){
+		return http.post(path.payTypeList, params)
+	},
+	//添加类型
+	addPayType(params){
+		return http.post(path.addPayType, params)
+	},
+	//获取详情
+	getEditPayType(params){
+		return http.get(path.editPayType, params)
+	},
+	//编辑类型
+	postEditPayType(params){
+		return http.post(path.editPayType, params)
+	},
+	//删除
+	delPayType(params){
+		return http.post(path.delPayType, params)
+	},
+	//支付类型列表
+	getPayTypes(params){
+		return http.get(path.getPayTypes, params)
+	},
 	//退出登录
 	loginOut(params){
 		return http.get(path.loginOut, params)
 	},
 }
-
-
-
-
-
-
-
-
 

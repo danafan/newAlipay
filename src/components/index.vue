@@ -3,35 +3,41 @@
 		<!-- 顶部导航 -->
 		<div class="tabBar">
 			<div class="tabLeft">
-				<div class="tabItem" v-for="(item,index) in tabList" :class="{'selTabItem':(item.default == true || item.isHover == true)}" @mouseenter="enter(index)" @mouseleave="leave(index)" @click="changeTab(index)">
-					{{item.name}}
-					<div v-if="item.isChild == true">
-						<img src="../assets/down1.png" v-if="item.default == true || item.isHover == true">
-						<img src="../assets/down.png" v-else>
-					</div>
-					<div class="line" v-if="item.default == true"></div>
-					<div class="selectBox" v-if="item.isHover == true && item.isChild == true" @click.stop>
-						<div class="selItem" :class="{'selectedItem':aliTab == 0}" @click="selAli(0,index)">支付宝管理</div>
-						<div class="selItem" :class="{'selectedItem':aliTab == 1}" @click="selAli(1,index)">支付宝流水</div>
-					</div>
-				</div>
-			</div>
-			<div class="tabRight">
-				<div class="userItem">
-					<img class="userimg" src="../assets/background.png">
-					{{username}}
-				</div>
-				<div class="userItem" @click="loginOut">
-					<img class="quit" src="../assets/quit.png">
-					退出
-				</div>
-			</div>
+				<el-menu 
+				:default-active="activeIndex" 
+				:router="true" 
+				:unique-opened="true" 
+				class="el-menu-demo" 
+				mode="horizontal" 
+				@select="handleSelect">
+				<el-menu-item index="/home">首页</el-menu-item>
+				<el-submenu index="2">
+					<template slot="title">财务</template>
+					<el-menu-item index="/control">支付宝管理</el-menu-item>
+					<el-menu-item index="/detailed">支付宝流水</el-menu-item>
+				</el-submenu>
+				<el-submenu index="3">
+					<template slot="title">费用类型</template>
+					<el-menu-item index="/cost_type">费用类型管理</el-menu-item>
+				</el-submenu>
+			</el-menu>
 		</div>
-		<!-- 下面内容 -->
-		<div class="cotentBox">
-			<router-view></router-view>
+		<div class="tabRight">
+			<div class="userItem">
+				<img class="userimg" src="../assets/background.png">
+				{{username}}
+			</div>
+			<div class="userItem" @click="loginOut">
+				<img class="quit" src="../assets/quit.png">
+				退出
+			</div>
 		</div>
 	</div>
+	<!-- 下面内容 -->
+	<div class="cotentBox">
+		<router-view></router-view>
+	</div>
+</div>
 </template>
 <style lang="less" scoped>
 .box{
@@ -151,125 +157,20 @@
 	export default{
 		data(){
 			return{
-				tabList:[{
-					name:"首页",
-					default:true,
-					isHover:false,
-					isChild:false
-				},{
-					name:"财务",
-					default:false,
-					isHover:false,
-					isChild:true	
-				}],									
-				aliTab:-1,			//默认选中支付宝管理
-				isAli:false,		//默认财务子菜单不显示
+				activeIndex:"/home",
 				username:"",		//用户名
-			}
-		},
-		watch:{
-			$route(n){
-				sessionStorage.setItem("tab",n.path);
-				if(n.path == "/home"){
-					this.tabList[0].default = true;
-					this.tabList[1].default = false;
-				}else if(n.path == "/index"){
-					let tab = sessionStorage.getItem("tab");
-					if(!!tab){
-						this.$router.push(tab);
-						if(tab == '/home'){
-							this.tabList[0].default = true;
-							this.tabList[1].default = false;
-						}else if(tab == '/control'){
-							this.tabList[1].default = true;
-							this.tabList[0].default = false;
-							this.aliTab = 0;
-						}else if(tab == '/detailed' || tab == '/content'){
-							this.tabList[1].default = true;
-							this.tabList[0].default = false;
-							this.aliTab = 1;
-						}
-					}else{
-						this.$router.push('/home');
-					}
-				}else{
-					this.tabList[1].default = true;
-					this.tabList[0].default = false;
-				};
 			}
 		},
 		created(){
 			this.username = sessionStorage.getItem("username");
 			let tab = sessionStorage.getItem("tab");
-			if(!!tab){
-				this.$router.push(tab);
-				if(tab == '/home'){
-					this.tabList[0].default = true;
-					this.tabList[1].default = false;
-				}else if(tab == '/control'){
-					this.tabList[1].default = true;
-					this.tabList[0].default = false;
-					this.aliTab = 0;
-				}else if(tab == '/detailed' || tab == '/content'){
-					this.tabList[1].default = true;
-					this.tabList[0].default = false;
-					this.aliTab = 1;
-				}
-			}else{
-				this.$router.push('/home');
-			}
+			this.activeIndex = tab;
 		},
 		methods:{
-			//鼠标移入导航                              
-			enter(index){	                          
-				this.tabList[index].isHover = true;                 
-			},                                        
-			//鼠标移出导航                              
-			leave(index){	
-				this.tabList[index].isHover = false;  
-			},
-			//点击切换导航
-			changeTab(index){
-				for (var i = 0; i < this.tabList.length; i++) {
-					if(i != index){
-						this.tabList[i].default = false;
-					}else{
-						this.tabList[i].default = true;
-					}
-				}
-				if(index == 0){
-					sessionStorage.setItem("tab",'/home');
-					this.$router.push('/home');
-					this.aliTab = -1;
-				}else{
-					if(this.aliTab == -1){
-						sessionStorage.setItem("tab",'/control');
-						this.aliTab = 0;
-						this.$router.push('/control');
-					}else{
-						let tab = sessionStorage.getItem("tab");
-						this.$router.push(tab);
-					}
-				}
-			},
-			//点击切换财务导航
-			selAli(type,index){
-				for (var i = 0; i < this.tabList.length; i++) {
-					if(i != index){
-						this.tabList[i].default = false;
-					}else{
-						this.tabList[i].default = true;
-					}
-				}
-				this.aliTab = type;
-				this.isAli = false;
-				if(type == 0){
-					sessionStorage.setItem("tab",'/control');
-					this.$router.push('/control');
-				}else{
-					sessionStorage.setItem("tab",'/detailed');
-					this.$router.push('/detailed');
-				}
+			//切换导航
+			handleSelect(index){
+				sessionStorage.setItem("tab",index);
+				this.activeIndex = index;
 			},
 			//退出
 			loginOut(){

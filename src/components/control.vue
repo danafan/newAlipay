@@ -25,7 +25,6 @@
 				</div>
 			</div>
 		</div>
-
 		<!-- 表格 -->
 		<div class="tabel">
 			<el-table :data="tableData" :cell-class-name="tabBox" :header-cell-class-name="tabHead" height="95%" style="width: 100%;height: 95%" :empty-text="text" v-loading="loading">

@@ -2,57 +2,69 @@
 	<div class="bottom">
 		<div class="han">
 			<div class="title">支付宝明细</div>
-			<div class="seachBox">
-				<div class="kua">
-					<div class="type">业务类型</div>
-					<el-select v-model="selType" filterable>
-						<el-option
-						v-for="item in typeList"
-						:key="item.business_type"
-						:label="item.business_type"
-						:value="item.business_type"
-						>
-					</el-option>
-				</el-select>
-			</div>
-			<div class="kua">
-				<div class="type">账单日期</div>
-				<el-date-picker
-				v-model="daySector"
-				type="daterange"
-				range-separator="至"
-				start-placeholder="开始日期"
-				end-placeholder="结束日期"
-				value-format="yyyy-MM-dd"
-				:picker-options="pickerOptions1"
-				@change="changeDay">
-			</el-date-picker>
-		</div>
-		<el-select v-model="selNum" placeholder="支付宝账号" filterable>
-			<el-option
-			v-for="item in accountList"
-			:key="item.id"
-			:label="item.alipay_name"
-			:value="item.id"
-			>
-		</el-option>
-	</el-select>
-	<div class="seach" @click="seach">查询</div>
-</div>
-<div class="down" @click="down">
+			<el-form :inline="true" size="small" class="demo-form-inline">
+				<el-form-item label="业务类型：">
+					<el-select v-model="business_type" :popper-append-to-body="false" filterable clearable placeholder="全部">
+						<el-option v-for="item in business_type_list" :key="item.business_type" :label="item.business_type" :value="item.business_type">
+						</el-option>
+					</el-select>
+				</el-form-item>
+				<el-form-item label="账单日期：">
+					<el-date-picker
+					v-model="bill_date"
+					type="daterange"
+					range-separator="至"
+					start-placeholder="开始日期"
+					end-placeholder="结束日期"
+					value-format="yyyy-MM-dd"
+					:picker-options="pickerOptions1"
+					>
+				</el-date-picker>
+			</el-form-item>
+			<el-form-item label="费用类型：">
+				<el-select v-model="pay_type" placeholder="全部" clearable filterable>
+					<el-option
+					v-for="item in pay_type_list"
+					:key="item.type_name"
+					:label="item.type_name"
+					:value="item.type_name"
+					>
+				</el-option>
+			</el-select>
+		</el-form-item>
+		<el-form-item label="支付宝账号：">
+			<el-select v-model="alipay_account_id" placeholder="全部" clearable filterable>
+				<el-option
+				v-for="item in account_list"
+				:key="item.id"
+				:label="item.alipay_name"
+				:value="item.id"
+				>
+			</el-option>
+		</el-select>
+	</el-form-item>
+	<el-form-item>
+		<el-button type="primary" size="small" @click="searchFun">搜索</el-button>
+	</el-form-item>
+</el-form>
+<div style="display:flex;justify-content: flex-end">
+	<div class="down" @click="down">
 	<img src="../assets/Excel.png">
 	导出excel
 </div>
 </div>
 
+</div>
 <!-- 表格 -->
 <div class="tabel">
-	<el-table :data="tableData" :cell-class-name="tabBox" :header-cell-class-name="tabHead" height="95%" style="height: 95%" v-loading="loading">
+	<el-table :data="dataObj.data" :cell-class-name="tabBox" :header-cell-class-name="tabHead" height="95%" style="height: 95%" v-loading="loading">
 		<el-table-column prop="bill_code" label="账务流水号" style="width: 10%">
 		</el-table-column>
 		<el-table-column prop="business_code" label="业务流水号" style="width: 10%">
 		</el-table-column>
 		<el-table-column prop="order_sn" label="订单号" style="width: 10%"> 
+		</el-table-column>
+		<el-table-column prop="alipay_name" label="支付宝账号" style="width: 10%"> 
 		</el-table-column>
 		<el-table-column prop="goods_name" label="商品名称" style="width: 10%">
 		</el-table-column>
@@ -79,6 +91,8 @@
 		</el-table-column>
 		<el-table-column prop="business_type" label="业务类型" style="width: 10%">
 		</el-table-column>
+		<el-table-column prop="pay_type" label="费用类型" style="width: 10%">
+		</el-table-column>
 		<el-table-column prop="account" label="对方账号" style="width: 10%">
 		</el-table-column>
 		<el-table-column prop="remark" label="备注" style="width: 10%">
@@ -93,7 +107,7 @@
 	:page-sizes="[10, 20, 30, 40]"
 	:page-size="pagesize"
 	layout="total, sizes, prev, pager, next, jumper"
-	:total="total">
+	:total="dataObj.total">
 </el-pagination>
 </div>
 
@@ -115,6 +129,7 @@
 	.han{
 		height: 8rem;
 		.title{
+			margin-bottom: 15px;
 			position: relative;
 			width: 100%;
 			text-align:center;
@@ -202,60 +217,36 @@
 	export default{
 		data(){
 			return{
-				typeList:[],				//业务类型列表
-				selType:"全部",				//选中的业务类型
-				accountList:[],				//支付宝账号列表
-				tableData: [],				//明细列表
+				bill_date:[],				//选中的时间区间
+				business_type_list:[],		//业务类型列表
+				business_type:"",			//选中的业务类型
+				account_list:[],			//支付宝账号列表
+				alipay_account_id:"",		//选中的支付宝账号
+				pay_type_list:[],			//支付类型列表
+				pay_type:"",				//选中的支付类型
+				dataObj:{},					//返回数据
 				pickerOptions1: {
 					disabledDate(time) {
 						return time.getTime() > Date.now();
 					}
 				},
-				default:new Date(),
-				daySector:null,				//选中的时间区间
-				startTime:"",				//开始时间
-				endTime:"",					//结束时间
-				selNum:"",					//选中的账号的id
-				selname:"",					//某一条的账号名称
-				total:0,					//总条数
 				page: 1,					//当前页码
 				pagesize:10,				//每页条数
 				loading:true
 			}
 		},
 		created(){
-			//获取支付宝明细
-			let date = sessionStorage.getItem("initDate");
-			this.selname = sessionStorage.getItem("selname");
-			this.selNum = this.$route.query.id;		//选中的商家id
-			if(!!date){
-				// this.daySector = [date,date];
-				this.startTime = date;
-				this.endTime = date;
-				let obj = {
-					alipay_account_id:this.selNum,
-					init_date:date,
-					business_type:this.selType == "全部" ? "" : this.selType,
-					page:this.page,
-					pagesize:this.pagesize
-				}
-				this.getAlipayBill(obj);
-			}else{
-				let obj = {
-					alipay_account_id:this.selNum,
-					business_type:this.selType == "全部" ? "" : this.selType,
-					start_date:!!this.daySector ? this.daySector[0] : "",
-					end_date:!!this.daySector ? this.daySector[1] : "",
-					page:this.page,
-					pagesize:this.pagesize
-				};
-						//获取支付宝明细
-						this.getAlipayBill(obj);
-					}
+			this.bill_date[0] = this.$route.query.date;			//时间区间
+			this.bill_date[1] = this.$route.query.date;			//时间区间
+			this.alipay_account_id = parseInt(this.$route.query.id);		//选中的商家id
 			//获取支付宝账户列表
 			this.getAlipay();
 			//获取业务类型
 			this.getbisType();
+			//费用类型列表
+			this.getPayTypes();
+			//获取支付宝明细
+			this.getAlipayBill();
 		},
 		methods:{
 			//导出
@@ -265,11 +256,10 @@
 					cancelButtonText: '取消',
 					type: 'warning'
 				}).then(() => {
-					let type = "";
-					if(this.selType != "全部"){
-						type = this.selType;
-					}
-					let href = "http://alipay.92nu.com/api/index/exportalipaybilldetail?business_type=" + type + "&alipay_account_id=" + this.selNum + "&start_date=" + this.startTime + "&end_date=" + this.endTime ;
+					let start_date = this.bill_date && this.bill_date.length> 0?this.bill_date[0]:"";
+					let end_date = this.bill_date && this.bill_date.length> 0?this.bill_date[1]:"";
+					let href = "http://alipay.92nu.com/api/index/exportalipaybilldetail?business_type=" + this.business_type + "&alipay_account_id=" + this.alipay_account_id + '&pay_type=' + this.pay_type + "&start_date=" + start_date + "&end_date=" + end_date;
+					// console.log(href)
 					window.open(href);
 				}).catch(() => {
 					this.$message({
@@ -282,11 +272,7 @@
 			getbisType(){
 				resource.businessType().then(res => {
 					if(res.data.code == '1'){
-						this.typeList = res.data.data;
-						let obj = {
-							business_type:"全部"
-						}
-						this.typeList.unshift(obj);
+						this.business_type_list = res.data.data;
 					}else{
 						this.$message({
 							message: res.data.message,
@@ -299,13 +285,7 @@
 			getAlipay(){
 				resource.aliPayList().then(res => {
 					if(res.data.code == "1"){
-						this.accountList = res.data.data;
-						// let obj = {
-						// 	id:"",
-						// 	alipay_name:"全部"
-						// }
-						// this.accountList.unshift(obj);
-						this.selNum = this.setf(this.accountList)[0].id;
+						this.account_list = res.data.data;
 					}else{
 						this.$message({
 							message: res.data.message,
@@ -314,19 +294,37 @@
 					}
 				});
 			},
-			setf(arr){
-				return arr.filter(item => item.alipay_name == this.selname);
+			//支付类型列表
+			getPayTypes(){
+				resource.getPayTypes().then(res => {
+					if(res.data.code == 1){
+						this.pay_type_list = res.data.data;
+					}else{
+						this.$message.warning(res.data.message);
+					}
+				})
+			},
+			//搜索
+			searchFun(){
+				this.page = 1;
+				//获取支付宝明细
+				this.getAlipayBill();
 			},
 			//获取支付宝明细
-			getAlipayBill(obj){
-				resource.alipayBill(obj).then(res => {
+			getAlipayBill(){
+				let arg = {
+					alipay_account_id:!this.alipay_account_id?'0':this.alipay_account_id,
+					business_type:this.business_type,
+					pay_type:this.pay_type,
+					start_date:this.bill_date && this.bill_date.length> 0?this.bill_date[0]:"",
+					end_date:this.bill_date && this.bill_date.length> 0?this.bill_date[1]:"",
+					page:this.page,
+					pagesize:this.pagesize
+				};
+				resource.alipayBill(arg).then(res => {
 					this.loading = false;
 					if(res.data.code == '1'){
-						let dataObj = res.data.data;
-						this.tableData = dataObj.list.data;		//明细列表
-						this.total = dataObj.list.total;		//总条数
-						this.page = dataObj.list.current_page;	//当前页
-						this.pagesize = parseInt(dataObj.list.per_page);	//每页条数
+						this.dataObj = res.data.data.list;
 					}else{
 						this.$message({
 							message: res.data.message,
@@ -335,58 +333,16 @@
 					}
 				});
 			},
-			//监听查询时间的变化
-			changeDay(val){
-				this.daySector = val;
-			},
-			//点击查询按钮
-			seach(){
-				this.loading = true;
-				sessionStorage.removeItem("initDate");
-				this.startTime = !!this.daySector ? this.daySector[0] : "";
-				this.endTime = !!this.daySector ? this.daySector[1] : "";
-				this.page = 1;
-				this.pagesize = 10;
-				let obj = {
-					alipay_account_id:this.selNum,
-					business_type:this.selType == "全部" ? "" : this.selType,
-					start_date:this.startTime,
-					end_date:this.endTime,
-					page:this.page,
-					pagesize:this.pagesize
-				};
-				//获取支付宝明细
-				this.getAlipayBill(obj);
-			},
-			//监听每页条数
+			//分页
 			handleSizeChange(val) {
-				this.loading = true;
 				this.pagesize = val;
-				let obj = {
-					alipay_account_id:this.selNum,
-					business_type:this.selType == "全部" ? "" : this.selType,
-					start_date:this.startTime,
-					end_date:this.endTime,
-					page:this.page,
-					pagesize:this.pagesize
-				};
-				//获取支付宝明细
-				this.getAlipayBill(obj);
+				//获取列表
+				this.getAlipayBill();
 			},
-			//监听页码的改变
 			handleCurrentChange(val) {
-				this.loading = true;
 				this.page = val;
-				let obj = {
-					alipay_account_id:this.selNum,
-					business_type:this.selType == "全部" ? "" : this.selType,
-					start_date:this.startTime,
-					end_date:this.endTime,
-					page:this.page,
-					pagesize:this.pagesize
-				};
-				//获取支付宝明细
-				this.getAlipayBill(obj);
+				//获取列表
+				this.getAlipayBill();
 			},
 			//设置表格头部样式
 			tabHead({ row, rowIndex}) {

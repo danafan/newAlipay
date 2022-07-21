@@ -302,10 +302,8 @@
 			},
 			//点击某一条的查看明细
 			lookDetail(val){
-				sessionStorage.setItem("tab",'/content');
-				sessionStorage.setItem("initDate",val.bill_date);
-				sessionStorage.setItem("selname",val.bill_account);
-				this.$router.push('/content?id=' + val.account_id);
+				sessionStorage.setItem("tab",`/content?date=${val.bill_date}&id=${val.account_id}`);
+				this.$router.push(`/content?date=${val.bill_date}&id=${val.account_id}`);
 			},
 			//切换页条数
 			handleSizeChange(val) {

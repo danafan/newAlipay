@@ -7,6 +7,7 @@ const home = resolve=>require(['@/components/home'],resolve)
 const control = resolve=>require(['@/components/control'],resolve)
 const detailed = resolve=>require(['@/components/detailed'],resolve)
 const content = resolve=>require(['@/components/content'],resolve)
+const cost_type = resolve=>require(['@/components/cost_type'],resolve)
 
 
 Vue.use(Router)
@@ -24,7 +25,8 @@ const router = new Router({
     { path: '/home', component: home},
     { path: '/control', component: control},
     { path: '/detailed', component: detailed},
-    { path: '/content', component: content}
+    { path: '/content', component: content},
+    { path: '/cost_type', component: cost_type},
     ]
   }
   ]
