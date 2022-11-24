@@ -1,5 +1,6 @@
 import http from './request.js'
 let path = {	
+	getAppKey:'login/getappkey',					//获取app_key
 	loginCheck:"login/islogin",						//验证是否登录
 	login: 'login/login',		   					//登录
 	yesterdayList:"index/yesterday_data",			//首页昨日报表
@@ -22,6 +23,10 @@ let path = {
 	loginOut:"login/quitlogin",						//退出登录
 }
 export default{
+	//获取app_key
+	getAppKey(params){
+		return http.get(path.getAppKey, params)
+	},
 	//验证是否登录
 	loginCheck(params){
 		return http.get(path.loginCheck, params)

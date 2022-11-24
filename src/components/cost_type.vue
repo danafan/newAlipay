@@ -39,6 +39,18 @@
  			<el-form-item label-width="100px" label="类型名称：">
  				<el-input style="width:160px" v-model="type_name" placeholder="请输入类型名称"></el-input>
  			</el-form-item>
+ 			<el-form-item label-width="120px" label="用友项目名称：">
+ 				<el-input style="width:160px" v-model="yy_type_name" placeholder="请输入用友项目名称"></el-input>
+ 			</el-form-item>
+ 			<el-form-item label-width="140px" label="用友项目大类编码：">
+ 				<el-input style="width:160px" v-model="yy_category_code" placeholder="请输入用友项目大类编码"></el-input>
+ 			</el-form-item>
+ 			<el-form-item label-width="120px" label="用友项目编号：">
+ 				<el-input style="width:160px" v-model="yy_item_no" placeholder="请输入用友项目编号"></el-input>
+ 			</el-form-item>
+ 			<el-form-item label-width="120px" label="用友科目名称：">
+ 				<el-input style="width:160px" v-model="yy_course_title" placeholder="请输入用友科目名称"></el-input>
+ 			</el-form-item>
  			<el-form-item label-width="100px" label="标题：">
  				<el-input style="width:160px" v-model="check_goods_name" placeholder="请输入标题"></el-input>
  				&nbsp
@@ -131,6 +143,10 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{-webkit-appea
 				isDialog:false,			//添加或编辑的弹窗是否显示
 				dialogTitle:"添加",		//弹窗标题
 				type_name:"",			//类型名称
+				yy_type_name:"",		//用友项目名称
+				yy_category_code:"",		//用友项目名称
+				yy_item_no:"",		//用友项目编号
+				yy_course_title:"",		//用友科目名称
 				check_goods_name:"",	//标题
 				goods_name_checked:false,
 				check_account:"",		//对方账号
@@ -174,6 +190,10 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{-webkit-appea
 						if(res.data.code == 1){
 							let row_data = res.data.data;
 							this.type_name = row_data.type_name === null?'':row_data.type_name;
+							this.yy_type_name = row_data.yy_type_name === null?'':row_data.yy_type_name;
+							this.yy_category_code = row_data.yy_category_code === null?'':row_data.yy_category_code;
+							this.yy_item_no = row_data.yy_item_no === null?'':row_data.yy_item_no;
+							this.yy_course_title = row_data.yy_course_title === null?'':row_data.yy_course_title;
 
 							this.check_goods_name = row_data.check_goods_name === null?'':row_data.check_goods_name;
 							this.goods_name_checked = row_data.check_goods_name != null;
@@ -195,6 +215,10 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{-webkit-appea
 			//关闭弹窗回调
 			closeDialog(){
 				this.type_name = "";
+				this.yy_type_name = "";
+				this.yy_category_code = "";
+				this.yy_item_no = "";
+				this.yy_course_title = "";
 				this.check_goods_name = "";
 				this.goods_name_checked = false;
 				this.check_account = "";
@@ -224,6 +248,10 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{-webkit-appea
 				}
 				var arg = {
 					type_name:this.type_name,
+					yy_type_name:this.yy_type_name,
+					yy_category_code:this.yy_category_code,
+					yy_item_no:this.yy_item_no,
+					yy_course_title:this.yy_course_title,
 					start_date:!this.start_date?'':this.start_date,
 					sort:this.sort
 				};

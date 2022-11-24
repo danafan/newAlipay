@@ -4,7 +4,7 @@
 			<div class="han">
 				<div class="title">支付宝管理</div>
 				<div class="seachBox">
-					<el-select class="seach" v-model="name" filterable placeholder="支付宝账号/店铺名称">
+					<el-select style="width: 200px" v-model="name" filterable placeholder="支付宝账号/店铺名称">
 						<el-option
 						v-for="item in accountList"
 						:key="item.id"
@@ -12,7 +12,9 @@
 						:value="item.id">
 					</el-option>
 				</el-select>
-				<div class="seachs" @click="serach">查询</div>
+				<el-input style="margin-left: 10px;width: 200px" v-model="company_body" placeholder="请输入公司主体"></el-input>
+				<el-input style="margin-left: 10px;width: 200px" v-model="shop" placeholder="请输入店铺"></el-input>
+				<el-button style="margin-left: 10px" type="primary" @click="serach">查询</el-button>
 			</div>
 			<div class="setBox">
 				<div class="down" @click="down">
@@ -78,10 +80,27 @@
 	<!-- 编辑或添加 -->
 	<div class="box1" v-if="moType == 1" @click.stop>
 		<div class="modelTitle">{{title}}</div>
-		<div class="numName">
-			<div class="name">账户名称</div>
-			<input type="text" v-model="numname">
+		<div class="content">
+			<el-form size="mini">
+				<el-form-item label="账户名称：" required>
+					<el-input style="width:180px" placeholder="请输入账户名称" v-model="numname">
+					</el-input>
+				</el-form-item>
+				<el-form-item label="公司主体：">
+					<el-input style="width:180px" placeholder="请输入公司主体" v-model="edit_company_body">
+					</el-input>
+				</el-form-item>
+				<el-form-item label="店铺：">
+					<el-input style="width:180px" placeholder="请输入店铺" v-model="edit_shop">
+					</el-input>
+				</el-form-item>
+				<el-form-item label="备注：">
+					<el-input style="width:180px" placeholder="请输入备注" v-model="account_remark">
+					</el-input>
+				</el-form-item>
+			</el-form>
 		</div>
+		
 		<div class="submit" @click="submit">提交</div>
 	</div>
 	<!-- 删除 -->
@@ -232,38 +251,20 @@
 	align-items: center;
 	justify-content:center;
 	.box1{
-		position: relative;
-		width: 20.6rem;
-		height: 12.3rem;
+		width: 320px;
 		background-color: #ffffff;
 		border-radius: 0.3rem;
 		.modelTitle{
-			margin-top: 1.85rem;
+			margin-top: 15px;
 			width: 100%;
 			text-align: center;
 			font-size: .8rem;
 			color: #333;
 		}
-		.numName{
-			margin-top: 2.45rem;
-			display:flex;
-			align-items: center;
-			justify-content:center;
-			.name{
-				margin-right: .85rem;
-				font-size: .8rem;
-				color: #333;
-			}
-			input{
-				width: 14.4rem;
-				height: 1.9rem;
-				border: solid 0.05rem #cecece;
-			}
+		.content{
+			padding:15px;
 		}
 		.submit{
-			position: absolute;
-			bottom: 0;
-			left: 0;
 			width: 100%;
 			text-align: center;
 			height: 2.5rem;
@@ -367,6 +368,8 @@
 			return{
 				accountList: [],		//支付宝账号列表
 				name: '',				//输入的搜索id
+				company_body:"",		//公司主体
+				shop:"",				//店铺
 				page: 1,				//当前页码
 				pagesize:10,			//每页的条数
 				tableData: [],			//列表
@@ -376,6 +379,9 @@
 				moType:1,				//默认弹框1
 				title:"添加支付宝账户",	//弹框标题
 				numname:"",				//输入的账户名称
+				edit_company_body:"",	//公司主体
+				edit_shop:"",			//店铺
+				account_remark:"",		//备注
 				text:"正在加载...",		//表格正在加载或者为空
 				isQrcode:false,			//默认二维码弹框不显示
 				loading: true
@@ -387,6 +393,8 @@
             //获取所有列表
             let obj = {
             	alipay_account_id:this.name,
+            	company_body:this.company_body,
+            	shop:this.shop,
             	page:this.page,
             	pagesize:this.pagesize
             }
@@ -432,6 +440,8 @@
 				this.loading = true;
 				let obj = {
 					alipay_account_id:this.name,
+					company_body:this.company_body,
+					shop:this.shop,
 					page:1,
 					pagesize:10
 				}
@@ -473,6 +483,9 @@
     				resource.alipayDetail({id:this.id}).then(res => {
     					if(res.data.code == '1'){
     						this.numname = res.data.data.alipay_name;
+    						this.edit_company_body = res.data.data.company_body;
+    						this.edit_shop = res.data.data.shop;
+    						this.account_remark = res.data.data.account_remark;
     					}else{
     						this.$message({
     							message: res.data.message,
@@ -494,7 +507,13 @@
 					});
 				}else{
 					if(this.title == "添加支付宝账户"){
-						resource.addAlipay({alipay_name:this.numname}).then(res => {
+						let arg = {
+							alipay_name:this.numname,
+							company_body:this.edit_company_body,
+							shop:this.edit_shop,
+							account_remark:this.account_remark
+						}
+						resource.addAlipay(arg).then(res => {
 							if(res.data.code == '1'){
 								this.$message({
 									message: res.data.message,
@@ -502,10 +521,16 @@
 								});
 								this.ismo = false;	//关闭弹框
 								this.numname = "";	//清空输入框
+								this.edit_company_body = "";
+								this.edit_shop = "";
+								this.account_remark = "";
 								this.accountLists();//获取所有列表
 							}else{
 								this.ismo = false;	//关闭弹框
 								this.numname = "";	//清空输入框
+								this.edit_company_body = "";
+								this.edit_shop = "";
+								this.account_remark = "";
 								this.$message({
 									message: res.data.message,
 									type: 'warning'
@@ -515,12 +540,19 @@
 					}else if(this.title == "编辑支付宝账户"){
 						let obj = {
 							id:this.id,
-							alipay_name:this.numname
+							alipay_name:this.numname,
+							company_body:this.edit_company_body,
+							shop:this.edit_shop,
+							account_remark:this.account_remark
 						}
 						resource.updateAlipay(obj).then(res => {
 							if(res.data.code == "1"){
+								this.$message.success(res.data.message)
 								this.ismo = false;	//关闭弹框
 								this.numname = "";	//清空输入框
+								this.edit_company_body = "";
+								this.edit_shop = "";
+								this.account_remark = "";
 								this.accountLists();//获取所有列表
 							}else{
 								this.$message({
@@ -547,6 +579,8 @@
     			this.page = val;
     			let obj = {
     				alipay_account_id:this.name,
+    				company_body:this.company_body,
+    				shop:this.shop,
     				page:this.page,
     				pagesize:this.pagesize
     			}
@@ -559,6 +593,8 @@
     			this.pagesize = val;
     			let obj = {
     				alipay_account_id:this.name,
+    				company_body:this.company_body,
+    				shop:this.shop,
     				page:this.page,
     				pagesize:this.pagesize
     			}
@@ -568,6 +604,9 @@
     		//点击关闭弹框
     		hide(){
     			this.numname = "";		//清空账户名
+    			this.edit_company_body = "";
+    			this.edit_shop = "";
+    			this.account_remark = "";
     			this.ismo = false;
     		},
     		//点击授权

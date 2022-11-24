@@ -164,7 +164,7 @@
 		created(){
 			this.username = sessionStorage.getItem("username");
 			let tab = sessionStorage.getItem("tab");
-			this.activeIndex = tab;
+			this.activeIndex = !tab?'/home':tab;
 		},
 		methods:{
 			//切换导航
