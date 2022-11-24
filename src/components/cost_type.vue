@@ -1,94 +1,98 @@
  <template>
  	<div class="sd">
  		<div class="title">费用类型管理</div>
- 		<div class="setBox">
- 			<el-button type="primary" size="small" icon="el-icon-circle-plus-outline" @click="showDialog('add')">添加</el-button>
- 		</div>
- 		<!-- 表格 -->
- 		<el-table :data="tableData.data" size="small" height="700" :cell-class-name="tabBox" :header-cell-class-name="tabHead" v-loading="loading">
- 			<el-table-column prop="type_name" label="类型名称"></el-table-column>
- 			<el-table-column label="匹配项">
- 				<template slot-scope="scope">
- 					<div>商品名称：{{scope.row.check_goods_name}}</div>
- 					<div>对方账号：{{scope.row.check_account}}</div>
- 					<div>业务类型：{{scope.row.check_business_type}}</div>
- 					<div>备注：{{scope.row.check_remark}}</div>
- 				</template>
- 			</el-table-column>
- 			<el-table-column prop="start_date" label="校验开始时间"></el-table-column>
- 			<el-table-column prop="add_time" label="添加时间"></el-table-column>
- 			<el-table-column label="操作">
- 				<template slot-scope="scope">
- 					<el-button size="small" type="text" @click="showDialog('edit',scope.row.id)">编辑</el-button>
- 					<el-button size="small" type="text" @click="deleteType(scope.row.id)">删除</el-button>
- 				</template>
- 			</el-table-column>
- 		</el-table>
- 		<div class="page">
- 			<el-pagination
- 			@size-change="handleSizeChange"
- 			@current-change="handleCurrentChange"
- 			:current-page="page"
- 			:page-sizes="[10, 20, 30, 40]"
- 			layout="total, sizes, prev, pager, next, jumper"
- 			:total="tableData.total">
- 		</el-pagination>
+ 		<div class="seachBox">
+ 		<el-input style="width: 200px" v-model="search" placeholder="请输入搜索内容"></el-input>
+ 		<el-button style="margin-left: 10px" type="primary" @click="handleCurrentChange(1)">查询</el-button>
  	</div>
- 	<el-dialog :title="dialogTitle" center @close="closeDialog" :close-on-click-modal="false" :visible.sync="isDialog">
- 		<el-form size="small" class="demo-form-inline">
- 			<el-form-item label-width="100px" label="类型名称：">
- 				<el-input style="width:160px" v-model="type_name" placeholder="请输入类型名称"></el-input>
- 			</el-form-item>
- 			<el-form-item label-width="120px" label="用友项目名称：">
- 				<el-input style="width:160px" v-model="yy_type_name" placeholder="请输入用友项目名称"></el-input>
- 			</el-form-item>
- 			<el-form-item label-width="140px" label="用友项目大类编码：">
- 				<el-input style="width:160px" v-model="yy_category_code" placeholder="请输入用友项目大类编码"></el-input>
- 			</el-form-item>
- 			<el-form-item label-width="120px" label="用友项目编号：">
- 				<el-input style="width:160px" v-model="yy_item_no" placeholder="请输入用友项目编号"></el-input>
- 			</el-form-item>
- 			<el-form-item label-width="120px" label="用友科目名称：">
- 				<el-input style="width:160px" v-model="yy_course_title" placeholder="请输入用友科目名称"></el-input>
- 			</el-form-item>
- 			<el-form-item label-width="100px" label="标题：">
- 				<el-input style="width:160px" v-model="check_goods_name" placeholder="请输入标题"></el-input>
- 				&nbsp
- 				<el-checkbox v-model="goods_name_checked"></el-checkbox>
- 			</el-form-item>
- 			<el-form-item label-width="100px" label="对方账号：">
- 				<el-input style="width:160px" v-model="check_account" placeholder="请输入对方账号"></el-input>
- 				&nbsp
- 				<el-checkbox v-model="account_checked"></el-checkbox>
- 			</el-form-item>
- 			<el-form-item label-width="100px" label="业务类型：">
- 				<el-input style="width:160px" v-model="check_business_type" placeholder="请输入业务类型"></el-input>
- 				&nbsp
- 				<el-checkbox v-model="business_type_checked"></el-checkbox>
- 			</el-form-item>
- 			<el-form-item label-width="100px" label="备注：">
- 				<el-input style="width:160px" v-model="check_remark" placeholder="请输入备注"></el-input>
- 				&nbsp
- 				<el-checkbox v-model="remark_checked"></el-checkbox>
- 			</el-form-item>
- 			<el-form-item label-width="100px" label="开始时间：">
- 				<el-date-picker
- 				style="width:160px"
- 				v-model="start_date"
- 				value-format="yyyy-MM-dd"
- 				type="date"
- 				placeholder="开始时间">
- 			</el-date-picker>
- 		</el-form-item>
- 		<el-form-item label-width="100px" label="优先级排序：">
- 			<el-input style="width:160px" type="number" v-model="sort" placeholder="0～99之间整数"></el-input>
- 		</el-form-item>
- 	</el-form>
- 	<div slot="footer" class="dialog-footer">
- 		<el-button type="primary" size="small" @click="isDialog = false">取消</el-button>
- 		<el-button type="primary" size="small" @click="commit">确认</el-button>
+ 	<div class="setBox">
+ 		<el-button type="primary" size="small" icon="el-icon-circle-plus-outline" @click="showDialog('add')">添加</el-button>
  	</div>
- </el-dialog>
+ 	<!-- 表格 -->
+ 	<el-table :data="tableData.data" size="small" height="700" :cell-class-name="tabBox" :header-cell-class-name="tabHead" v-loading="loading">
+ 		<el-table-column prop="type_name" label="类型名称"></el-table-column>
+ 		<el-table-column label="匹配项">
+ 			<template slot-scope="scope">
+ 				<div>商品名称：{{scope.row.check_goods_name}}</div>
+ 				<div>对方账号：{{scope.row.check_account}}</div>
+ 				<div>业务类型：{{scope.row.check_business_type}}</div>
+ 				<div>备注：{{scope.row.check_remark}}</div>
+ 			</template>
+ 		</el-table-column>
+ 		<el-table-column prop="start_date" label="校验开始时间"></el-table-column>
+ 		<el-table-column prop="add_time" label="添加时间"></el-table-column>
+ 		<el-table-column label="操作">
+ 			<template slot-scope="scope">
+ 				<el-button size="small" type="text" @click="showDialog('edit',scope.row.id)">编辑</el-button>
+ 				<el-button size="small" type="text" @click="deleteType(scope.row.id)">删除</el-button>
+ 			</template>
+ 		</el-table-column>
+ 	</el-table>
+ 	<div class="page">
+ 		<el-pagination
+ 		@size-change="handleSizeChange"
+ 		@current-change="handleCurrentChange"
+ 		:current-page="page"
+ 		:page-sizes="[10, 20, 30, 40]"
+ 		layout="total, sizes, prev, pager, next, jumper"
+ 		:total="tableData.total">
+ 	</el-pagination>
+ </div>
+ <el-dialog :title="dialogTitle" center @close="closeDialog" :close-on-click-modal="false" :visible.sync="isDialog">
+ 	<el-form size="small" class="demo-form-inline">
+ 		<el-form-item label-width="100px" label="类型名称：">
+ 			<el-input style="width:160px" v-model="type_name" placeholder="请输入类型名称"></el-input>
+ 		</el-form-item>
+ 		<el-form-item label-width="120px" label="用友项目名称：">
+ 			<el-input style="width:160px" v-model="yy_type_name" placeholder="请输入用友项目名称"></el-input>
+ 		</el-form-item>
+ 		<el-form-item label-width="140px" label="用友项目大类编码：">
+ 			<el-input style="width:160px" v-model="yy_category_code" placeholder="请输入用友项目大类编码"></el-input>
+ 		</el-form-item>
+ 		<el-form-item label-width="120px" label="用友项目编号：">
+ 			<el-input style="width:160px" v-model="yy_item_no" placeholder="请输入用友项目编号"></el-input>
+ 		</el-form-item>
+ 		<el-form-item label-width="120px" label="用友科目名称：">
+ 			<el-input style="width:160px" v-model="yy_course_title" placeholder="请输入用友科目名称"></el-input>
+ 		</el-form-item>
+ 		<el-form-item label-width="100px" label="标题：">
+ 			<el-input style="width:160px" v-model="check_goods_name" placeholder="请输入标题"></el-input>
+ 			&nbsp
+ 			<el-checkbox v-model="goods_name_checked"></el-checkbox>
+ 		</el-form-item>
+ 		<el-form-item label-width="100px" label="对方账号：">
+ 			<el-input style="width:160px" v-model="check_account" placeholder="请输入对方账号"></el-input>
+ 			&nbsp
+ 			<el-checkbox v-model="account_checked"></el-checkbox>
+ 		</el-form-item>
+ 		<el-form-item label-width="100px" label="业务类型：">
+ 			<el-input style="width:160px" v-model="check_business_type" placeholder="请输入业务类型"></el-input>
+ 			&nbsp
+ 			<el-checkbox v-model="business_type_checked"></el-checkbox>
+ 		</el-form-item>
+ 		<el-form-item label-width="100px" label="备注：">
+ 			<el-input style="width:160px" v-model="check_remark" placeholder="请输入备注"></el-input>
+ 			&nbsp
+ 			<el-checkbox v-model="remark_checked"></el-checkbox>
+ 		</el-form-item>
+ 		<el-form-item label-width="100px" label="开始时间：">
+ 			<el-date-picker
+ 			style="width:160px"
+ 			v-model="start_date"
+ 			value-format="yyyy-MM-dd"
+ 			type="date"
+ 			placeholder="开始时间">
+ 		</el-date-picker>
+ 	</el-form-item>
+ 	<el-form-item label-width="100px" label="优先级排序：">
+ 		<el-input style="width:160px" type="number" v-model="sort" placeholder="0～99之间整数"></el-input>
+ 	</el-form-item>
+ </el-form>
+ <div slot="footer" class="dialog-footer">
+ 	<el-button type="primary" size="small" @click="isDialog = false">取消</el-button>
+ 	<el-button type="primary" size="small" @click="commit">确认</el-button>
+ </div>
+</el-dialog>
 </div>
 </template>
 <style lang="less" scoped>
@@ -102,6 +106,12 @@
 	font-size: .8rem;
 	color: #333;
 	font-weight: bold;
+}
+.seachBox{
+	margin-top: 2.4rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 .setBox{
 	margin-top: 10px;
@@ -136,6 +146,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{-webkit-appea
 	export default{
 		data(){
 			return{
+				search:'',
 				page: 1,				//当前页码
 				pagesize:10,			//每页的条数
 				tableData: {},			//列表
@@ -169,7 +180,7 @@ input::-webkit-outer-spin-button, input::-webkit-inner-spin-button{-webkit-appea
 		methods:{
 			//获取列表
 			getData(){
-				resource.payTypeList({page:this.page,pagesize:this.pagesize}).then(res => {
+				resource.payTypeList({page:this.page,pagesize:this.pagesize,search:this.search}).then(res => {
 					this.loading = false;
 					if(res.data.code == "1"){
 						this.tableData = res.data.data;

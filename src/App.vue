@@ -11,6 +11,8 @@
   export default {
     name: 'app',
     created(){
+      // this.$router.push('/home');
+      // return
       //验证是否登录
       resource.loginCheck().then(res => {
         if(res.data.code == '1'){

@@ -31,6 +31,8 @@
 		<div class="tabel">
 			<el-table :data="tableData" :cell-class-name="tabBox" :header-cell-class-name="tabHead" height="95%" style="width: 100%;height: 95%" :empty-text="text" v-loading="loading">
 				<el-table-column prop="alipay_name" label="支付宝账号" style="width: 10%"> </el-table-column>
+				<el-table-column prop="company_body" label="公司主体" style="width: 10%"> </el-table-column>
+				<el-table-column prop="shop" label="店铺" style="width: 10%"> </el-table-column>
 				<el-table-column label="添加时间" style="width: 10%">
 					<template slot-scope="scope">
 						<p>{{scope.row.add_time | updateTime}}</p>
@@ -52,6 +54,7 @@
 						<div class="shou" v-if="scope.row.account_status == 0" @click="grant(scope.row.grant_url)">授权</div>
 					</template>
 				</el-table-column>
+				<el-table-column prop="account_remark" label="备注" style="width: 10%"> </el-table-column>
 				<el-table-column label="操作" style="width: 10%">
 					<template slot-scope="scope">
 						<div class="icon">
