@@ -11,6 +11,7 @@
   export default {
     name: 'app',
     created(){
+      //验证是否登录
       resource.loginCheck().then(res => {
         if(res.data.code == '1'){
           sessionStorage.setItem("username",res.data.name);
