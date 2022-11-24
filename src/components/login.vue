@@ -61,7 +61,7 @@
 			getAppKey() {
 				resource.getAppKey().then((res) => {
 					if (res.data.code == "1") {
-						let appKey = res.data.data.appkey;
+						let appKey = res.data.data;
 						this.ddLoginInit(appKey);
 					} else {
 						this.$message.warning(res.data.msg);
