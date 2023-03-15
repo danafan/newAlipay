@@ -10,13 +10,13 @@
 				class="el-menu-demo" 
 				mode="horizontal" 
 				@select="handleSelect">
-				<el-menu-item index="/home">首页</el-menu-item>
+				<el-menu-item index="/home" v-if="only_read == '0'">首页</el-menu-item>
 				<el-submenu index="2">
 					<template slot="title">财务</template>
-					<el-menu-item index="/control">支付宝管理</el-menu-item>
+					<el-menu-item index="/control" v-if="only_read == '0'">支付宝管理</el-menu-item>
 					<el-menu-item index="/detailed">支付宝流水</el-menu-item>
 				</el-submenu>
-				<el-submenu index="3">
+				<el-submenu index="3" v-if="only_read == '0'">
 					<template slot="title">费用类型</template>
 					<el-menu-item index="/cost_type">费用类型管理</el-menu-item>
 				</el-submenu>
@@ -157,14 +157,20 @@
 	export default{
 		data(){
 			return{
-				activeIndex:"/home",
+				activeIndex:"",
 				username:"",		//用户名
+				only_read:'1'
 			}
 		},
 		created(){
 			this.username = sessionStorage.getItem("username");
-			let tab = sessionStorage.getItem("tab");
-			this.activeIndex = !tab?'/home':tab;
+			this.only_read = sessionStorage.getItem("only_read");
+			if(this.only_read == '1'){
+				this.activeIndex = '/detailed';
+			}else{
+				let tab = sessionStorage.getItem("tab");
+				this.activeIndex = !tab?'/home':tab;
+			}
 		},
 		methods:{
 			//切换导航
