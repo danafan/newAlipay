@@ -16,11 +16,10 @@
       //验证是否登录
       resource.loginCheck().then(res => {
         if(res.data.code == '1'){
-          sessionStorage.setItem("username",res.data.name);
+          this.$store.commit('setUserName',res.data.name);
+          this.$store.commit('setOnlyRead',res.data.only_read);
           let tab = sessionStorage.getItem("tab");
-          let only_read = res.data.only_read;
-          sessionStorage.setItem("only_read",only_read);
-          if(only_read == '1'){
+          if(res.data.only_read == '1'){
             this.$router.push('/detailed');
           }else{
             if(!!tab){

@@ -158,13 +158,19 @@
 		data(){
 			return{
 				activeIndex:"",
-				username:"",		//用户名
-				only_read:'1'
+			}
+		},
+		computed:{
+			//username
+			username(){
+				return this.$store.state.username;
+			},
+			//username
+			only_read(){
+				return this.$store.state.only_read;
 			}
 		},
 		created(){
-			this.username = sessionStorage.getItem("username");
-			this.only_read = sessionStorage.getItem("only_read");
 			if(this.only_read == '1'){
 				this.activeIndex = '/detailed';
 			}else{
