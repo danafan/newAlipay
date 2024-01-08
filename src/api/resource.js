@@ -20,6 +20,7 @@ let path = {
 	editPayType:'paytype/editpaytype',				//编辑类型
 	delPayType:'paytype/delpaytype',				//删除支付类型
 	getPayTypes:'index/getpaytypes',				//支付类型列表
+	grantCancel:'finance/grantcancel',				//取消授权
 	loginOut:"login/quitlogin",						//退出登录
 }
 export default{
@@ -110,6 +111,10 @@ export default{
 	//支付类型列表
 	getPayTypes(params){
 		return http.get(path.getPayTypes, params)
+	},
+	//取消授权
+	grantCancel(params){
+		return http.post(path.grantCancel, params)
 	},
 	//退出登录
 	loginOut(params){
