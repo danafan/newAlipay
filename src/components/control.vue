@@ -55,6 +55,8 @@
 						<div class="shou" v-if="scope.row.account_status == 1" @click="cancelAuth(scope.row.id)">取消授权</div>
 					</template>
 				</el-table-column>
+				<el-table-column prop="balance" label="账户余额" style="width: 10%"></el-table-column>
+				<el-table-column prop="balance_update_time" label="余额获取时间" style="width: 10%"></el-table-column>
 				<el-table-column prop="account_remark" label="备注" style="width: 10%"> </el-table-column>
 				<el-table-column label="操作" style="width: 10%">
 					<template slot-scope="scope">
